@@ -38,6 +38,19 @@ class PageContext(BaseModel):
     title: Optional[str] = None
 
 
+class Hotspot(BaseModel):
+    id: Optional[str] = None
+    width: Optional[int] = None
+    height: Optional[int] = None
+    label: Optional[str] = None
+    style: Optional[str] = None
+    defaultOpen: Optional[bool] = None
+    textColor: Optional[str] = None
+    bgColor: Optional[str] = None
+    x: Optional[float] = None
+    y: Optional[float] = None
+
+
 class Step(BaseModel):
     id: Optional[str] = None
     type: str
@@ -45,6 +58,7 @@ class Step(BaseModel):
     subtitle: Optional[str] = None
     clickContext: Optional[ClickContext] = None
     pageContext: Optional[PageContext] = None
+    hotspots: Optional[List[Hotspot]] = None
 
 
 class FlowData(BaseModel):
