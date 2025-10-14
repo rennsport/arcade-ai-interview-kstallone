@@ -4,3 +4,6 @@
 # Caches
 .jython_cache/
 __pycache__/
+
+# macOS
+.DS_Store
