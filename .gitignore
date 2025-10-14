@@ -1,0 +1,6 @@
+# Environment variables
+.env
+
+# Caches
+.jython_cache/
+__pycache__/
