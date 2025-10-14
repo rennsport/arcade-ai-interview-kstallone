@@ -42,6 +42,47 @@ def extract_basic_info(flow_data: FlowData):
     print(f"Status: {flow_data.status}")
 
 
-if __name__ == "__main__":
+def extract_captured_events(flow_data: FlowData):
+    """Extract captured events"""
+    print("Captured Events")
+    print("=" * 20)
+    print(f"Total Events: {len(flow_data.capturedEvents)}")
+    print()
+    for event in flow_data.capturedEvents:
+        print(f"Event: {event.type}")
+        print(f"Time: {event.timeMs}")
+        print(f"Start Time: {event.startTimeMs}")
+        print(f"End Time: {event.endTimeMs}")
+        print(f"Click ID: {event.clickId}")
+        print(f"Frame X: {event.frameX}")
+        print(f"Frame Y: {event.frameY}")
+        print()
+
+
+def extract_steps_info(flow_data: FlowData):
+    """Extract steps information"""
+    print("Steps")
+    print("=" * 20)
+    print(f"Total Steps: {len(flow_data.steps)}")
+    print()
+    for step in flow_data.steps:
+        print(f"Step: {step.type}")
+        print(f"ID: {step.id}")
+        print(f"Title: {step.title}")
+        print(f"Subtitle: {step.subtitle}")
+        print()
+
+
+def main():
+    """Main function"""
     flow_data = load_flow_data()
+    print()
     extract_basic_info(flow_data)
+    print()
+    extract_captured_events(flow_data)
+    print()
+    extract_steps_info(flow_data)
+
+
+if __name__ == "__main__":
+    main()
