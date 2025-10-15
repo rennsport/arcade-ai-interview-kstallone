@@ -50,8 +50,11 @@ def process_flow(file_path: str):
             'timestamp_datetime': ms_to_datetime(event.timeMs or 0),
             'start_time_datetime': ms_to_datetime(event.startTimeMs or 0),
             'end_time_datetime': ms_to_datetime(event.endTimeMs or 0),
+            'duration_seconds': 0,
             'clickId': event.clickId or '',
         }
+        if event.startTimeMs and event.endTimeMs:
+            event_data['duration_seconds'] = (event.endTimeMs - event.startTimeMs) / 1000.0
         events.append(event_data)
 
     return {
