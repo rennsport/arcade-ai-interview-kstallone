@@ -19,6 +19,19 @@ import csv
 from pathlib import Path
 from arcade_flow_analyzer.models import FlowData
 from pydantic import ValidationError
+from datetime import datetime
+
+
+def ms_to_datetime(timestamp_ms: int) -> str:
+    """Convert milliseconds timestamp to readable datetime"""
+    if timestamp_ms and timestamp_ms > 0:
+        try:
+            timestamp_seconds = timestamp_ms / 1000.0
+            dt = datetime.fromtimestamp(timestamp_seconds)
+            return dt.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+        except Exception:
+            return ""
+    return ""
 
 
 def process_flow(file_path: str):
@@ -34,9 +47,9 @@ def process_flow(file_path: str):
     for event in flow_data.capturedEvents:
         event_data = {
             'type': event.type,
-            'timestamp_datetime': event.timeMs or 0,
-            'start_time_datetime': event.startTimeMs or 0,
-            'end_time_datetime': event.endTimeMs or 0,
+            'timestamp_datetime': ms_to_datetime(event.timeMs or 0),
+            'start_time_datetime': ms_to_datetime(event.startTimeMs or 0),
+            'end_time_datetime': ms_to_datetime(event.endTimeMs or 0),
             'clickId': event.clickId or '',
         }
         events.append(event_data)
