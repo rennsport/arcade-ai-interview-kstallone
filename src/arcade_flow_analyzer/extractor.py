@@ -34,7 +34,9 @@ def process_flow(file_path: str):
     for event in flow_data.capturedEvents:
         event_data = {
             'type': event.type,
-            'timeMs': event.timeMs or 0,
+            'timestamp_datetime': event.timeMs or 0,
+            'start_time_datetime': event.startTimeMs or 0,
+            'end_time_datetime': event.endTimeMs or 0,
             'clickId': event.clickId or '',
         }
         events.append(event_data)
