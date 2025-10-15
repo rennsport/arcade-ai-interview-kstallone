@@ -58,6 +58,8 @@ def process_flow(file_path: str):
             'duration_seconds': 0,
             'click_text': '',
             'hotspot_label': '',
+            'page_url': '',
+            'page_title': '',
             'clickId': event.clickId or '',
         }
         if event.startTimeMs and event.endTimeMs:
@@ -71,6 +73,12 @@ def process_flow(file_path: str):
             hotspot = step_data.hotspots
             if hotspot:
                 event_data['hotspot_label'] = hotspot[0].label or ''
+        
+        if step_data and step_data.pageContext:
+            page_context = step_data.pageContext
+            page_url = page_context.url or ''
+            event_data['page_url'] = page_url
+            event_data['page_title'] = page_context.title or ''
 
     return {
         'name': flow_data.name,
