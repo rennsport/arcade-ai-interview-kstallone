@@ -44,18 +44,33 @@ def process_flow(file_path: str):
         raise ValueError(f"Validation failed: {e}")
 
     events = []
+    steps_lookup = {step.id: step for step in flow_data.steps if step.id}
+
     for event in flow_data.capturedEvents:
+        event_id = event.clickId or f"event_{len(events)}"
+        step_data = steps_lookup.get(event_id)
+
         event_data = {
             'type': event.type,
             'timestamp_datetime': ms_to_datetime(event.timeMs or 0),
             'start_time_datetime': ms_to_datetime(event.startTimeMs or 0),
             'end_time_datetime': ms_to_datetime(event.endTimeMs or 0),
             'duration_seconds': 0,
+            'click_text': '',
+            'hotspot_label': '',
             'clickId': event.clickId or '',
         }
         if event.startTimeMs and event.endTimeMs:
             event_data['duration_seconds'] = (event.endTimeMs - event.startTimeMs) / 1000.0
         events.append(event_data)
+
+        if step_data and step_data.clickContext:
+            event_data['click_text'] = step_data.clickContext.text or ''
+        
+        if step_data and step_data.hotspots:
+            hotspot = step_data.hotspots
+            if hotspot:
+                event_data['hotspot_label'] = hotspot[0].label or ''
 
     return {
         'name': flow_data.name,
