@@ -1,0 +1,12 @@
+User's Journey:
+1. Clicked on 'search' to start searching for a product (searching for: Scooter) on the Target website.
+2. Typed text.
+3. Scrolled the page.
+4. Clicked on 'Razor A5 Lux 2 Wheel Kick Scooter' to learn more about its features and see all available options.
+5. Scrolled the page.
+6. Clicked on 'Blue' to choose the blue color option for the Razor A5 Lux Kick Scooter.
+7. Clicked on 'Pink' to explore more color choices for the scooter.
+8. Clicked on 'Add to cart' to secure the selected scooter before it sells out.
+9. Clicked on 'Decline coverage' to skip adding a protection plan for the scooter.
+10. Clicked on '1' to visit the cart, review the selected items, and proceed to checkout.
+11. Performed a dragging action.
