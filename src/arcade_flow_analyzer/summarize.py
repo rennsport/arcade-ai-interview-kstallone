@@ -1,5 +1,8 @@
 """
 Summarize user actions using LangChain and OpenAI.
+
+Included agentic and non-agentic options. Non-agentic chain seems to perform better.
+LangChain csv agent is still experimental.
 """
 
 import os
@@ -8,21 +11,27 @@ from pathlib import Path
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_experimental.agents.agent_toolkits import create_csv_agent
+from langchain_community.document_loaders.csv_loader import CSVLoader
 from csv_preprocessor import preprocess_csv
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.chains.llm import LLMChain
+from langchain_core.prompts import ChatPromptTemplate
 
 load_dotenv()
 
+BASE_PROMPT = """You are an AI assistant that summarizes user actions in detail from a CSV file. The CSV file now has columns including 'action_description' to help you understand the user's journey. Your task is to provide a clear, step-by-step list of the user's journey. After the list, provide a summary of the user's journey in a narrative format."""
 
-def main():
+
+def summarize_actions(force_regenerate=False, agent=False):
     # Check if API key is available
     if not os.getenv('OPENAI_API_KEY'):
-        print("Please create a .env file with: "
-              "OPENAI_API_KEY=your_api_key_here")
+        print("Please create a .env file with: 'OPENAI_API_KEY=your_api_key_here")
         return
 
     # Preprocess the CSV
     input_csv = 'cache/actions.csv'
     processed_csv = 'cache/processed_actions.csv'
+    summary_cache = 'cache/ai-summary.txt'
 
     if not os.path.exists(input_csv):
         print(f"CSV file not found: {input_csv}")
@@ -30,12 +39,50 @@ def main():
 
     preprocess_csv(input_csv, processed_csv)
 
+    # Check for summary cache
+    if not force_regenerate and os.path.exists(summary_cache):
+        print("Using cached AI summary via Agent:")
+        with open(summary_cache, 'r') as f:
+            cached_summary = f.read()
+        print("=" * 60)
+        print(cached_summary)
+        print("=" * 60)
+        return
 
     llm = ChatOpenAI(temperature=0.75)
-    agent_executer = create_csv_agent(llm, processed_csv, verbose=True, allow_dangerous_code=True, handle_parsing_errors=True)
 
-    agent_executer.invoke("""You are an AI assistant that summarizes user actions in detail from a CSV file. The CSV file now has columns including 'action_description' to help you understand the user's journey. Your task is to provide a clear, step-by-step list of the user's journey. After the list, provide a summary of the user's journey in a narrative format.""")
+    if agent:
+        # LangChain agent
+        print("Generating new AI summary:")
+
+        agent_executer = create_csv_agent(
+            llm, processed_csv, verbose=True,
+            allow_dangerous_code=True,
+            handle_parsing_errors=True
+        )
+
+        result = agent_executer.invoke(BASE_PROMPT)
+
+        print(result)
+
+    else:
+        print("Generating new AI summary via Chain:")
+        loader = CSVLoader(file_path=processed_csv)
+        docs = loader.load()
+
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", f"{BASE_PROMPT} Here is the data:\n\n{{context}}")
+        ])
+        chain = create_stuff_documents_chain(llm, prompt)
+        result = chain.invoke({"context": docs})
+        print(result)
+
+    # Save the result to cache
+    with open(summary_cache, 'w') as f:
+        f.write(str(result))
+
+    print(f"Summary saved to {summary_cache}")
 
 
 if __name__ == "__main__":
-    main()
+    summarize_actions()
