@@ -6,8 +6,6 @@ LangChain csv agent is still experimental.
 """
 
 import os
-import sys
-from pathlib import Path
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_experimental.agents.agent_toolkits import create_csv_agent
@@ -19,29 +17,38 @@ from langchain_core.prompts import ChatPromptTemplate
 
 load_dotenv()
 
-BASE_PROMPT = """You are an AI assistant that summarizes user actions in detail from a CSV file. The CSV file now has columns including 'action_description' to help you understand the user's journey. Your task is to provide a clear, step-by-step list of the user's journey. After the list, provide a summary of the user's journey in a narrative format."""
+BASE_PROMPT = """You are an AI assistant that summarizes user actions in detail
+from a CSV file. The CSV file now has columns including 'action_description'
+to help you understand the user's journey. Your task is to provide a clear,
+step-by-step list of the user's journey. No need to include time stamps or other metadata."""
 
 
 def summarize_actions(force_regenerate=False, agent=False):
     # Check if API key is available
     if not os.getenv('OPENAI_API_KEY'):
-        print("Please create a .env file with: 'OPENAI_API_KEY=your_api_key_here")
+        print("Please create a .env file with: 'OPENAI_API_KEY=your_api_key_here'")
         return
 
     # Preprocess the CSV
     input_csv = 'cache/actions.csv'
     processed_csv = 'cache/processed_actions.csv'
-    summary_cache = 'cache/ai-summary.txt'
+    
+    # Separate cache files for agentic vs non-agentic approaches
+    if agent:
+        summary_cache = 'cache/ai-summary-agentic.txt'
+    else:
+        summary_cache = 'cache/ai-summary-chain.txt'
 
     if not os.path.exists(input_csv):
         print(f"CSV file not found: {input_csv}")
         return
 
     preprocess_csv(input_csv, processed_csv)
+    approach = "Agentic" if agent else "Chain"
 
     # Check for summary cache
     if not force_regenerate and os.path.exists(summary_cache):
-        print("Using cached AI summary via Agent:")
+        print(f"Using cached AI summary ({approach} approach):")
         with open(summary_cache, 'r') as f:
             cached_summary = f.read()
         print("=" * 60)
@@ -53,7 +60,7 @@ def summarize_actions(force_regenerate=False, agent=False):
 
     if agent:
         # LangChain agent
-        print("Generating new AI summary:")
+        print("Generating new AI summary (Agentic approach):")
 
         agent_executer = create_csv_agent(
             llm, processed_csv, verbose=True,
@@ -66,22 +73,45 @@ def summarize_actions(force_regenerate=False, agent=False):
         print(result)
 
     else:
-        print("Generating new AI summary via Chain:")
+        print("Generating new AI summary (Chain approach):")
         loader = CSVLoader(file_path=processed_csv)
         docs = loader.load()
 
-        prompt = ChatPromptTemplate.from_messages([
+        # First chain: Generate steps
+        steps_prompt = ChatPromptTemplate.from_messages([
             ("system", f"{BASE_PROMPT} Here is the data:\n\n{{context}}")
         ])
-        chain = create_stuff_documents_chain(llm, prompt)
-        result = chain.invoke({"context": docs})
-        print(result)
+        steps_chain = create_stuff_documents_chain(llm, steps_prompt)
+        steps_result = steps_chain.invoke({"context": docs})
 
-    # Save the result to cache
+        # Second chain: Generate summary from steps
+        # Convert steps_result to a document for the second chain
+        from langchain_core.documents import Document
+        steps_doc = Document(page_content=str(steps_result))
+        
+        summary_prompt = ChatPromptTemplate.from_messages([
+            ("system", "Based on the following step-by-step list of user actions, "
+             "provide a clear narrative summary of the user's journey:\n\n{context}")
+        ])
+        
+        summary_chain = create_stuff_documents_chain(llm, summary_prompt)
+        summary_result = summary_chain.invoke({"context": [steps_doc]})
+
+        print("=" * 60)
+        print("STEPS:")
+        print(steps_result)
+        print("\nSUMMARY:")
+        print(summary_result)
+        print("=" * 60)
+
+    # Save the result to cache (keeping original caching logic for now)
     with open(summary_cache, 'w') as f:
-        f.write(str(result))
+        if agent:
+            f.write(str(result))
+        else:
+            f.write(str(summary_result))
 
-    print(f"Summary saved to {summary_cache}")
+    print(f"Summary saved to {summary_cache} ({approach} approach)")
 
 
 if __name__ == "__main__":
