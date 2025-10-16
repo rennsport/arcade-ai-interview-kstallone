@@ -11,22 +11,6 @@ import base64
 load_dotenv()
 
 
-# def download_image_from_url(url, filepath):
-#     """Download image from URL and save to filepath"""
-#     try:
-#         response = requests.get(url)
-#         response.raise_for_status()
-
-#         with open(filepath, 'wb') as f:
-#             f.write(response.content)
-
-#         print(f"Image downloaded successfully to: {filepath}")
-#         return True
-#     except Exception as e:
-#         print(f"Error downloading image: {e}")
-#         return False
-
-
 def generate_flow_image(force_regenerate=False):
     """Generate a creative image based on the user journey summary"""
 
