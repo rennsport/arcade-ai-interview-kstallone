@@ -1,17 +1,5 @@
 """
 Arcade Flow/Actions Extractor
-
-Current: Bare minimum as in loads the JSON, does basic validation,
-extracts basic event info, and saves to CSV.
-
-TODO: Extend to extract more information from the flow.json file. Include:
-- Steps
-- Hotspots
-- Page Context
-- Click Context
-- Search Term
-- Page Title
-- Page Domain
 """
 
 import json
