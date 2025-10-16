@@ -1,9 +1,9 @@
 """
-Generate images based on user journey summaries using OpenAI's 4o image generation API.
+Generate images based on user journey summaries
+using OpenAI's 4o image generation API.
 """
 
 import os
-import requests
 from dotenv import load_dotenv
 from openai import OpenAI
 import base64
@@ -40,13 +40,16 @@ def generate_flow_image(force_regenerate=False):
         return
 
     client = OpenAI()
-
-    prompt = f"""
-    You are an expert at marketing and design. Generate a creative image suitable for sharing on social platforms that represents the user flow/journey and would drive engagement. It should be a single image, that captures the essence of how easy it is do what is described in the user journey. Here is a summary of the user journey: {user_journey}
-    """
+    prompt = (
+        "You are an expert at marketing and design. Generate a creative image "
+        "suitable for sharing on social platforms that represents the user "
+        "flow/journey and would drive engagement. It should be a single image, "
+        "that captures the essence of how easy it is do what is described in "
+        f"the user journey. Here is a summary of the user journey: {user_journey}"
+    )
 
     result = client.images.generate(
-        model="gpt-image-1",
+        model="dall-e-3",
         prompt=prompt
     )
 

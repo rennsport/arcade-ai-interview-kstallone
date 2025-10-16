@@ -1,7 +1,9 @@
 """
 Summarize user actions using LangChain and OpenAI.
 
-Included agentic and non-agentic options. Non-agentic chain seems to perform better.
+Included agentic and non-agentic options.
+Non-agentic chain seems to perform better.
+
 LangChain csv agent is still experimental.
 """
 
@@ -14,7 +16,6 @@ from langchain_openai import ChatOpenAI
 from langchain_experimental.agents.agent_toolkits import create_csv_agent
 from langchain_community.document_loaders.csv_loader import CSVLoader
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.chains.llm import LLMChain
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.documents import Document
 
@@ -23,18 +24,20 @@ load_dotenv()
 BASE_PROMPT = """You are an AI assistant that summarizes user actions in detail
 from a CSV file. The CSV file now has columns including 'action_description'
 to help you understand the user's journey. Your task is to provide a clear,
-step-by-step list of the user's journey. No need to include time stamps or other metadata."""
+step-by-step list of the user's journey. No need to include time stamps or
+other metadata."""
 
 
 def summarize_actions(force_regenerate=False, agent=False):
     if not os.getenv('OPENAI_API_KEY'):
-        print("Please create a .env file with: 'OPENAI_API_KEY=your_api_key_here'")
+        print("Please create a .env file with: "
+              "'OPENAI_API_KEY=your_api_key_here'")
         return
 
     # Preprocess the CSV
     input_csv = 'cache/actions.csv'
     processed_csv = 'cache/processed_actions.csv'
-    
+
     # Separate cache files for agentic vs non-agentic approaches
     if agent:
         summary_cache = 'cache/ai-summary-agentic.txt'
@@ -60,7 +63,9 @@ def summarize_actions(force_regenerate=False, agent=False):
             print("=" * 60)
             return
     else:
-        if not force_regenerate and os.path.exists(steps_cache) and os.path.exists(summary_cache):
+        if (not force_regenerate and
+                os.path.exists(steps_cache) and
+                os.path.exists(summary_cache)):
             print(f"Using cached AI analysis ({approach} approach):")
             with open(steps_cache, 'r') as f:
                 cached_steps = f.read()
@@ -105,12 +110,12 @@ def summarize_actions(force_regenerate=False, agent=False):
         # Second chain: Generate summary from steps
         # Convert steps_result to a document for the second chain
         steps_doc = Document(page_content=str(steps_result))
-        
+
         summary_prompt = ChatPromptTemplate.from_messages([
             ("system", "Based on the following step-by-step list of user actions, "
              "provide a clear narrative summary of the user's journey. The steps are in order and should be summarized in a way that is easy to understand and follow:\n\n{context}")
         ])
-        
+
         summary_chain = create_stuff_documents_chain(llm, summary_prompt)
         summary_result = summary_chain.invoke({"context": [steps_doc]})
 
