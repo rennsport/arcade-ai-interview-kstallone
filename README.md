@@ -2,9 +2,9 @@
 
 ## Next steps/TODO
 
-1. Switched to gpt-image-1 and results are much improved. ~~Generate a better image for marketing. I believe the chain is generating a prompt that is too detailed and or literal. This is something I don't have a tremendous amount of experience with and need to investigate more. The prompt can be seen here:~~
+1. Switched to gpt-image-1 and results are much improved. ~~Generate a better image for marketing. I believe the chain is generating a prompt that is too detailed and or literal. Image prompting is something I don't have a tremendous amount of experience with and need to investigate more. The prompt can be seen here:~~
 > ~~"Design a visually appealing image that captures the user journey of purchasing a scooter from Target without using any words. The image should be highly engaging and suitable for sharing on social platforms. It should convey the user's actions of searching, scrolling, selecting, adding to cart, and dragging to checkout. Use creative elements and colors to represent the different steps of the journey. Keep the image under 1000 characters including whitespace to ensure optimal social media compatibility."~~ 
-2. Expand the Pydantic model to include more of the fields and talk with other engineers to determine with fields are truly optional and which are required
+2. Expand the Pydantic model to include more of the fields and talk with other engineers to determine which fields are truly optional and which are required
 3. Implement FastAPI endpoint(s) to allow the backend to process more than just one local flow.json. I imagine it being a put endpoint with some user selectable options (such as ignoring cache). It'd return the markdown report for any given flow.json
 4. Implement a better caching system/database. Given the uniqueness of flow.jsons there could be multiple approaches. If we don't see a ton of variety, maybe use Postgres tables to store extracted info from the flow.jsons and generated AI summaries. If we anticipate a ton of variety, then probably a redis db with a ttl so if the same flow.json is uploaded within a specific time period we can serve the cached markdown file and image.
 5. Dockerize the pipeline. Once FastAPI is implemented with a caching system we like, create a Dockerfile to create an image that we can deploy
