@@ -1,3 +1,71 @@
+# Added by Kevin Stallone:
+
+## Next steps/TODO
+
+1. Generate a better image for marketing. I believe the chain is generating a prompt that is too detailed and or literal. This is something I don't have a tremendous amount of experience with and need to investigate more. The prompt can be seen here:
+> "Design a visually appealing image that captures the user journey of purchasing a scooter from Target without using any words. The image should be highly engaging and suitable for sharing on social platforms. It should convey the user's actions of searching, scrolling, selecting, adding to cart, and dragging to checkout. Use creative elements and colors to represent the different steps of the journey. Keep the image under 1000 characters including whitespace to ensure optimal social media compatibility."
+2. Expand the Pydantic model to include more of the fields and talk with other engineers to determine with fields are truly optional and which are required
+3. Implement FastAPI endpoint(s) to allow the backend to process more than just one local flow.json. I imagine it being a put endpoint with some user selectable options (such as ignoring cache). It'd return the markdown report for any given flow.json
+4. Implement a better caching system/database. Given the uniqueness of flow.jsons there could be multiple approaches. If we don't see a ton of variety, maybe use Postgress tables to store extracted info from the flow.jsons and generated AI summaries. If we anticipate a ton of variety, then probably a redis db with a ttl so if the same flow.json is uploaded within a specific time period we can serve the cached markdown file and image.
+5. Dockerize the pipeline. Once FastAPI is implemented with a caching system we like, create a Dockerfile to create an image that we can deploy
+
+## Project Structure
+
+### Source Code Organization (`src/`)
+
+The project is organized into modules for better maintainability:
+
+```
+src/
+├── main.py                                    # Main entry point - runs complete analysis pipeline
+└── arcade_flow_analyzer/
+    ├── __init__.py                           # Package initialization and exports
+    ├── models.py                             # Pydantic data models for flow validation
+    ├── extractors/                           # Data extraction modules
+    │   ├── __init__.py
+    │   ├── extractor.py                      # Main flow data extraction logic
+    │   └── basic_extractor.py                # Basic extraction used for testing
+    ├── analysis/                             # Data processing & AI summarization
+    │   ├── __init__.py
+    │   ├── csv_preprocessor.py               # CSV preprocessing for AI analysis
+    │   └── summarize.py                      # AI-powered summarization (chain & agentic)
+    └── visualization/                        # Image generation
+        ├── __init__.py
+        └── image_gen.py                      # DALL-E image generation
+```
+
+### Cache Structure (`cache/`)
+
+The application uses caching to avoid redundant inference API calls to OpenAI:
+
+```
+cache/
+├── actions.csv                               # Extracted user actions from flow.json
+├── processed_actions.csv                     # Preprocessed CSV for AI analysis
+├── ai-steps-chain.txt                        # AI-generated step-by-step user journey
+├── ai-summary-chain.txt                      # AI-generated narrative summary
+├── ai-summary-agentic.txt                    # Alternative agentic approach summary
+└── image/                                    # Image generation cache
+    ├── image-description.txt                 # AI-generated image prompt
+    ├── image-url.txt                         # DALL-E generated image URL
+    └── generated-image.png                   # Downloaded image file
+```
+
+### Running the Pipeline
+
+The complete analysis pipeline can be run with:
+
+```bash
+poetry run python3 src/main.py
+```
+
+This executes the following steps:
+1. **Extract** actions from `flow.json` → save to `cache/actions.csv`
+2. **Summarize** user journey using AI → generate steps and summary files
+3. **Visualize** flow with DALL-E → create marketing image
+4. **Report** → combine all results into timestamped markdown file
+
+
 # Arcade AI Interview Challenge
 
 Welcome to the Arcade AI Interview Challenge! This project tests your ability to work with AI multimodal APIs, and be creative with your problem solving
