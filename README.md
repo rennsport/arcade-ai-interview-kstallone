@@ -31,7 +31,7 @@ src/
     │   └── summarize.py                      # AI-powered summarization (chain & agentic)
     └── visualization/                        # Image generation
         ├── __init__.py
-        └── image_gen.py                      # DALL-E image generation
+        └── image_gen.py                      # gpt-image-1 image generation
 ```
 
 ### Cache Structure (`cache/`)
@@ -46,9 +46,10 @@ cache/
 ├── ai-summary-chain.txt                      # AI-generated narrative summary
 ├── ai-summary-agentic.txt                    # Alternative agentic approach summary
 └── image/                                    # Image generation cache
-    ├── image-description.txt                 # AI-generated image prompt
-    ├── image-url.txt                         # DALL-E generated image URL
-    └── generated-image.png                   # Downloaded image file
+    ├── image-description.txt                 # AI-generated image prompt (unused)
+    ├── image-url.txt                         # DALL-E generated image URL (unused)
+    ├── generated-image.png                   # Downloaded image file (DALL-E Image; unused)
+    └── marking-image.png                     # Downloaded image file (Igpt-image-1; used)
 ```
 
 ### Running the Pipeline
@@ -62,7 +63,7 @@ poetry run python3 src/main.py
 This executes the following steps:
 1. **Extract** actions from `flow.json` → save to `cache/actions.csv`
 2. **Summarize** user journey using AI → generate steps and summary files
-3. **Visualize** flow with DALL-E → create marketing image
+3. **Visualize** flow with Image API and gpt-image-1 → create marketing image
 4. **Report** → combine all results into timestamped markdown file
 
 
