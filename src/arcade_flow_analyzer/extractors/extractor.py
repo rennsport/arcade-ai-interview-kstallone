@@ -17,7 +17,7 @@ TODO: Extend to extract more information from the flow.json file. Include:
 import json
 import csv
 from pathlib import Path
-from arcade_flow_analyzer.models import FlowData
+from ..models import FlowData
 from pydantic import ValidationError
 from datetime import datetime
 

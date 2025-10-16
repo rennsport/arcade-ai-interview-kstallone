@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from .models import FlowData
+from ..models import FlowData
 from pydantic import ValidationError
 
 

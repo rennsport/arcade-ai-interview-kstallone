@@ -75,7 +75,7 @@ def generate_flow_image(force_regenerate=False):
         print("Summary file is empty")
         return
 
-    base_prompt = """Generate a creative image suitable for sharing on social platforms that represents the user flow/journey and would drive engagement. Don't use words in the image. Here is a summary of the user journey: {user_journey}"""
+    base_prompt = """Generate a creative image suitable for sharing on social platforms that represents the user flow/journey and would drive engagement. It should be a single image, that captures  the essence of how easy it is to shop on Target.com. Don't use words in the image. Here is a summary of the user journey: {user_journey}"""
 
     # DALL-E with LangChain
     # https://docs.langchain.com/oss/python/integrations/tools/dalle_image_generator
@@ -83,7 +83,7 @@ def generate_flow_image(force_regenerate=False):
     llm = OpenAI(temperature=0.9)
     prompt_template = PromptTemplate(
         input_variables=["image_desc"],
-        template="Generate a prompt to generate an image based on the following description. Don't use words in the image. Limit prompt to 1000 characters including whitespace: {image_desc}",
+        template="Generate a prompt to generate a creative image suitable for sharing on social platforms that represents the user flow/journey. Don't use words in the image. Limit prompt to 1000 characters including whitespace: {image_desc}",
     )
 
     # Generate the image description using modern LangChain approach

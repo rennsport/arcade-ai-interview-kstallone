@@ -8,7 +8,7 @@ LangChain csv agent is still experimental.
 import os
 from dotenv import load_dotenv
 
-from csv_preprocessor import preprocess_csv
+from .csv_preprocessor import preprocess_csv
 
 from langchain_openai import ChatOpenAI
 from langchain_experimental.agents.agent_toolkits import create_csv_agent
