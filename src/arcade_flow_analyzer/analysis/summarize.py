@@ -8,7 +8,7 @@ LangChain csv agent is still experimental.
 import os
 from dotenv import load_dotenv
 
-from .csv_preprocessor import preprocess_csv
+from arcade_flow_analyzer.analysis.csv_preprocessor import preprocess_csv
 
 from langchain_openai import ChatOpenAI
 from langchain_experimental.agents.agent_toolkits import create_csv_agent
@@ -74,7 +74,7 @@ def summarize_actions(force_regenerate=False, agent=False):
             print("=" * 60)
             return
 
-    llm = ChatOpenAI(temperature=0.75)
+    llm = ChatOpenAI(temperature=0.60)
 
     if agent:
         # LangChain agent
@@ -108,7 +108,7 @@ def summarize_actions(force_regenerate=False, agent=False):
         
         summary_prompt = ChatPromptTemplate.from_messages([
             ("system", "Based on the following step-by-step list of user actions, "
-             "provide a clear narrative summary of the user's journey:\n\n{context}")
+             "provide a clear narrative summary of the user's journey. The steps are in order and should be summarized in a way that is easy to understand and follow:\n\n{context}")
         ])
         
         summary_chain = create_stuff_documents_chain(llm, summary_prompt)
